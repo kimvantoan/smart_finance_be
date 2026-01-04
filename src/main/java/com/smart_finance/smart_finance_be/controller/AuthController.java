@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smart_finance.smart_finance_be.payload.request.RegisterRequest;
+import com.smart_finance.smart_finance_be.payload.request.VerifyOtpRequest;
 import com.smart_finance.smart_finance_be.service.AuthService;
+import com.smart_finance.smart_finance_be.service.OtpService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -18,10 +20,16 @@ import lombok.AllArgsConstructor;
 public class AuthController {
     
     private final AuthService authService;
+    private final OtpService otpService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         return authService.register(registerRequest);
     }
 
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpRequest req) {
+        return otpService.verifyOtp(req);
+    }
+    
 }

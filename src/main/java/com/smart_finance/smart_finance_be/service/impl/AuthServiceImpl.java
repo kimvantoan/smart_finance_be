@@ -16,6 +16,7 @@ import com.smart_finance.smart_finance_be.service.AuthService;
 import com.smart_finance.smart_finance_be.service.EmailService;
 import com.smart_finance.smart_finance_be.service.OtpService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
 
     @Override
+    @Transactional
     public ResponseEntity<?> register(RegisterRequest req) {
         if (userRepository.existsByEmail(req.getEmail())) {
             throw new BusinessException("EMAIL_EXISTS");
