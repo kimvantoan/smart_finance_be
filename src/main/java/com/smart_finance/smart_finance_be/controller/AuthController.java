@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smart_finance.smart_finance_be.payload.request.RegisterRequest;
+import com.smart_finance.smart_finance_be.payload.request.ResendOtpRequest;
 import com.smart_finance.smart_finance_be.payload.request.VerifyOtpRequest;
 import com.smart_finance.smart_finance_be.service.AuthService;
 import com.smart_finance.smart_finance_be.service.OtpService;
@@ -30,6 +31,11 @@ public class AuthController {
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpRequest req) {
         return otpService.verifyOtp(req);
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<?> resendOtp(@Valid @RequestBody ResendOtpRequest req) {
+        return otpService.resendOtp(req.getEmail());
     }
     
 }

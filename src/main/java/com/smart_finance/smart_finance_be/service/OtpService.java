@@ -12,4 +12,5 @@ public interface OtpService {
 
     ResponseEntity<?> verifyOtp(VerifyOtpRequest req);
     
+    ResponseEntity<?> resendOtp(String email);
 }

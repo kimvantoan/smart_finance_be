@@ -24,15 +24,17 @@ public class EmailServiceImpl implements EmailService {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true, "UTF-8");
-
+                new MimeMessageHelper(message, true, "UTF-8");
+    
+            helper.setFrom("no-reply@gmail.com");
             helper.setTo(toEmail);
             helper.setSubject(subject);
-            helper.setText(text, true); 
-
+            helper.setText(text, true);
+    
             javaMailSender.send(message);
-
+    
         } catch (MessagingException e) {
+            e.printStackTrace();
             throw new BusinessException("SEND_EMAIL_FAILED");
         }
     }
