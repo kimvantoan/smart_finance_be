@@ -51,7 +51,7 @@ public class OtpServiceImpl implements OtpService{
         entity.setEmail(email);
         entity.setOtp(otp);
         entity.setExpiredAt(LocalDateTime.now().plusMinutes(expiredMinutes));
-        entity.setUsed(false);
+        entity.setUsed(Boolean.FALSE);
         otpRepository.save(entity);
     }
 
@@ -72,7 +72,7 @@ public class OtpServiceImpl implements OtpService{
             return ResponseEntity.badRequest().body(new ErrorMessage(400, Constants.OTP_EXPIRED_MES));
         }
 
-        otpEntity.setUsed(true);
+        otpEntity.setUsed(Boolean.TRUE);
         otpRepository.save(otpEntity);
 
         Users user = userRepository.findByEmail(req.getEmail())
