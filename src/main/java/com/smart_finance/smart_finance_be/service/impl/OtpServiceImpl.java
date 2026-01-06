@@ -1,6 +1,7 @@
 package com.smart_finance.smart_finance_be.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -57,15 +58,22 @@ public class OtpServiceImpl implements OtpService{
     @Override
     public ResponseEntity<?> verifyOtp(VerifyOtpRequest req) {
 
-        OtpEntity entity = otpRepository.findByEmailAndOtpAndUsedFalse(req.getEmail(),req.getOtp())
-                .orElseThrow(() -> new BusinessException("OTP_INVALID"));
+        Optional<OtpEntity> entity = otpRepository.findByEmailAndOtpAndUsedFalse(req.getEmail(),req.getOtp());
+
+        // OTP invalid
+        if(entity.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ErrorMessage(400, Constants.OTP_INVALID_MES));
+        }
         
-        if(entity.getExpiredAt().isBefore(LocalDateTime.now())) {
-            throw new BusinessException("OTP_EXPIRED");
+        OtpEntity otpEntity = entity.get();
+
+        // OTP expired
+        if(otpEntity.getExpiredAt().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body(new ErrorMessage(400, Constants.OTP_EXPIRED_MES));
         }
 
-        entity.setUsed(true);
-        otpRepository.save(entity);
+        otpEntity.setUsed(true);
+        otpRepository.save(otpEntity);
 
         Users user = userRepository.findByEmail(req.getEmail())
                 .orElseThrow(() -> new BusinessException("USER_NOT_FOUND"));
@@ -82,7 +90,7 @@ public class OtpServiceImpl implements OtpService{
 
         OtpEntity entity = otpRepository.findByEmailAndExpiredAtAfter(email, LocalDateTime.now());
 
-        System.out.println(entity);
+        // OTP still valid
         if(entity != null) {
             return ResponseEntity.badRequest().body(new ErrorMessage(Constants.OTP_STILL_VALID_CODE, Constants.OTP_STILL_VALID_MES));
         }
