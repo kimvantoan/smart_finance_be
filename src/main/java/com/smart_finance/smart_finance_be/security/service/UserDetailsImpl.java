@@ -10,6 +10,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class UserDetailsImpl implements UserDetails {
+    private Long id;
 
     private String username;
 
