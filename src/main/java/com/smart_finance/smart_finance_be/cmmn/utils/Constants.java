@@ -25,4 +25,7 @@ public class Constants {
 
     //No authorization
     public static final String HAVE_NO_CATEGORY_MES = "Bạn không có danh mục này";
+
+    //Transaction
+    public static final String TRANSACTION_NOT_FOUND_MES = "Không tìm thấy giao dịch";
 }
