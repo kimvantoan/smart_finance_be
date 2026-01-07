@@ -33,5 +33,20 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         @Param("month") Integer month
     );
 
+    @Query(value = """
+            SELECT t.id, t.category_id, t.type, t.amount, t.transaction_date, t.note
+            FROM transactions t
+            WHERE t.user_id = :userId
+                AND (:type IS NULL OR t.type = :type)
+                AND (:month IS NULL OR (MONTH(t.transaction_date) = :month))
+                AND (:year IS NULL OR YEAR(t.transaction_date) = :year)
+                """, nativeQuery = true)
+    List<TransactionProjection> findAllByUserId(
+        @Param("userId") Long userId, 
+        @Param("type") String type, 
+        @Param("year") Integer year,
+        @Param("month") Integer month
+    );
+
     Optional<Transaction> findByUserIdAndId(Long userId, Long id);
 }

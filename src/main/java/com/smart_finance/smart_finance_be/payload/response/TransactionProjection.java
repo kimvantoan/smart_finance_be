@@ -11,6 +11,6 @@ public interface TransactionProjection {
     CategoryType getType();
     BigDecimal getAmount();
     LocalDate getTransactionDate();
-    String getNote();
+    String getNote();   
 
 }
