@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.smart_finance.smart_finance_be.entity.Categories;
+import com.smart_finance.smart_finance_be.entity.CategoryType;
 import com.smart_finance.smart_finance_be.payload.response.CategoryProjection;
 
 @Repository

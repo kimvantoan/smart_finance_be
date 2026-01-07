@@ -56,7 +56,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public ResponseEntity<?> getTransactions( String type, Long categoryId, Integer year, Integer month) {
        Long userId = SecurityUtils.getCurrentUserId();
-       System.out.println("month: " + month);
 
        List<TransactionProjection> transactions = transactionRepository.findByUserId(userId , type, categoryId, year, month);
 
