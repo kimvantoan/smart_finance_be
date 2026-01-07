@@ -17,6 +17,7 @@ import com.smart_finance.smart_finance_be.cmmn.utils.SecurityUtils;
 import com.smart_finance.smart_finance_be.entity.Categories;
 import com.smart_finance.smart_finance_be.entity.Transaction;
 import com.smart_finance.smart_finance_be.payload.request.TransactionRequest;
+import com.smart_finance.smart_finance_be.payload.response.TransactionProjection;
 import com.smart_finance.smart_finance_be.payload.response.TransactionResponse;
 import com.smart_finance.smart_finance_be.repository.CategoryRepository;
 import com.smart_finance.smart_finance_be.repository.TransactionRepository;
@@ -57,11 +58,9 @@ public class TransactionServiceImpl implements TransactionService {
        Long userId = SecurityUtils.getCurrentUserId();
        System.out.println("month: " + month);
 
-       List<Transaction> transactions = transactionRepository.findByUserId(userId , type, categoryId, year, month);
+       List<TransactionProjection> transactions = transactionRepository.findByUserId(userId , type, categoryId, year, month);
 
-       List<TransactionResponse> response = transactions.stream().map(t -> modelMapper.map(t, TransactionResponse.class)).toList();
-
-       return ResponseEntity.ok().body(new Response().setDataList(response).setMessage("Get transactions success"));
+       return ResponseEntity.ok().body(new Response().setDataList(transactions).setMessage("Get transactions success"));
 
     }
 
