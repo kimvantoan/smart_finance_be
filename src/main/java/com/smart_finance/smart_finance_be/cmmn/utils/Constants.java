@@ -23,4 +23,6 @@ public class Constants {
     public static final String OTP_INVALID_MES = "OTP không chính xác";
     public static final String OTP_EXPIRED_MES = "OTP đã hết hạn";
 
+    //No authorization
+    public static final String HAVE_NO_CATEGORY_MES = "Bạn không có danh mục này";
 }
