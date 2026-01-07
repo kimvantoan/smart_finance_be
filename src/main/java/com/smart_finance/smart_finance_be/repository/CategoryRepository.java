@@ -23,4 +23,6 @@ public interface CategoryRepository extends JpaRepository<Categories, Long> {
     List<CategoryProjection> findByUserId(Long userId, @Param("status") String status);
 
     Optional<Categories> findById(Long id);
+
+    Optional<Categories> findByUserIdAndId(Long userId, Long id);
 }
