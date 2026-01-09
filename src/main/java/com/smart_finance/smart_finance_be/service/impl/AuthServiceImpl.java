@@ -1,5 +1,6 @@
 package com.smart_finance.smart_finance_be.service.impl;
 
+import java.time.ZoneId;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -14,10 +15,12 @@ import org.springframework.stereotype.Service;
 import com.smart_finance.smart_finance_be.cmmn.base.Response;
 import com.smart_finance.smart_finance_be.cmmn.exception.ErrorMessage;
 import com.smart_finance.smart_finance_be.cmmn.utils.Constants;
+import com.smart_finance.smart_finance_be.entity.OtpEntity;
 import com.smart_finance.smart_finance_be.entity.UserStatus;
 import com.smart_finance.smart_finance_be.entity.Users;
 import com.smart_finance.smart_finance_be.payload.request.LoginRequest;
 import com.smart_finance.smart_finance_be.payload.request.RegisterRequest;
+import com.smart_finance.smart_finance_be.repository.OtpRepository;
 import com.smart_finance.smart_finance_be.repository.UserRepository;
 import com.smart_finance.smart_finance_be.security.jwt.JwtUtils;
 import com.smart_finance.smart_finance_be.service.AuthService;
@@ -37,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final JwtUtils jwtUtils;
+    private final OtpRepository otpRepository;
 
     @Override
     @Transactional
@@ -60,7 +64,16 @@ public class AuthServiceImpl implements AuthService {
 
         emailService.sendEmail(req.getEmail(), "OTP", otp);
 
-        return ResponseEntity.ok().body(new Response().setMessage("Send OTP to email"));
+        OtpEntity existingOtp = otpRepository.findByEmailAndOtpAndUsedFalse(req.getEmail(), otp).orElseThrow(() -> 
+            new RuntimeException("OTP not found or already used"));
+
+        Long expiredAt = existingOtp
+                .getExpiredAt()
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
+
+        return ResponseEntity.ok().body(new Response().setMessage("Send OTP to email").setData(expiredAt));
         
     }
 
@@ -96,3 +109,4 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.ok().body(new Response().setData(token).setMessage("Login success"));
     }
 }
+                                    

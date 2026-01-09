@@ -1,6 +1,7 @@
 package com.smart_finance.smart_finance_be.service.impl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -62,14 +63,14 @@ public class OtpServiceImpl implements OtpService{
 
         // OTP invalid
         if(entity.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ErrorMessage(400, Constants.OTP_INVALID_MES));
+            return ResponseEntity.badRequest().body(new ErrorMessage(Constants.OTP_INVALID_CODE, Constants.OTP_INVALID_MES));
         }
         
         OtpEntity otpEntity = entity.get();
 
         // OTP expired
         if(otpEntity.getExpiredAt().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest().body(new ErrorMessage(400, Constants.OTP_EXPIRED_MES));
+            return ResponseEntity.badRequest().body(new ErrorMessage(Constants.OTP_INVALID_CODE, Constants.OTP_INVALID_MES));
         }
 
         otpEntity.setUsed(Boolean.TRUE);
@@ -96,7 +97,18 @@ public class OtpServiceImpl implements OtpService{
         }
 
         String otp = this.generateOtp();
+       
         saveOtp(email, otp);
+
+        OtpEntity existingOtp = otpRepository.findByEmailAndOtpAndUsedFalse(email, otp).orElseThrow(() -> 
+        new RuntimeException("OTP not found or already used"));
+        
+        Long expiredAt = existingOtp
+            .getExpiredAt()
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli();
+
         try {
             emailService.sendEmail(
                 email,
@@ -109,6 +121,6 @@ public class OtpServiceImpl implements OtpService{
             e.printStackTrace();
             throw new BusinessException("UNKNOWN_EMAIL_ERROR");
         }
-        return ResponseEntity.ok().body(new Response().setMessage("Send OTP to email"));
+        return ResponseEntity.ok().body(new Response().setMessage("Send OTP to email").setData(expiredAt));
     }
 }
