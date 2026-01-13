@@ -34,9 +34,10 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<?> getAllCategories(
-        @RequestParam(required = false) String status
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) String type
     ) {
-        return categoryService.getCategories(status);
+        return categoryService.getCategories(status, type);
     }
 
     @GetMapping("/{id}")

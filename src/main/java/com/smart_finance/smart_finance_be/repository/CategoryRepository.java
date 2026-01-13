@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.smart_finance.smart_finance_be.entity.Categories;
-import com.smart_finance.smart_finance_be.entity.CategoryType;
 import com.smart_finance.smart_finance_be.payload.response.CategoryProjection;
 
 @Repository
@@ -20,8 +19,9 @@ public interface CategoryRepository extends JpaRepository<Categories, Long> {
             WHERE c.user_id = :userId 
                 AND c.deleted = false
                 AND (:status IS NULL OR c.status = :status)
+                AND (:type IS NULL OR c.type = :type)
             """, nativeQuery = true)
-    List<CategoryProjection> findByUserId(Long userId, @Param("status") String status);
+    List<CategoryProjection> findByUserId(Long userId, @Param("status") String status, @Param("type") String type);
 
     Optional<Categories> findById(Long id);
 
