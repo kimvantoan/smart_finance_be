@@ -7,7 +7,7 @@ import com.smart_finance.smart_finance_be.payload.request.CategoryRequest;
 public interface CategoryService {
     ResponseEntity<?> createCategory(CategoryRequest req);
 
-    ResponseEntity<?> getCategories(String status);
+    ResponseEntity<?> getCategories(String status, String type);
 
     ResponseEntity<?> getCategoryById(Long id);
 

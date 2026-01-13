@@ -43,9 +43,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ResponseEntity<?> getCategories(String status) {
+    public ResponseEntity<?> getCategories(String status, String type) {
        Long userId = SecurityUtils.getCurrentUserId();
-       List<CategoryProjection> categories = categoryRepository.findByUserId(userId, status);
+       List<CategoryProjection> categories = categoryRepository.findByUserId(userId, status, type);
 
        return ResponseEntity.ok().body(new Response().setDataList(categories).setMessage("Get categories success"));
     }
