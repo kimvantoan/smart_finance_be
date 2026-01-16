@@ -4,4 +4,8 @@ import org.springframework.http.ResponseEntity;
 
 public interface ReportService {
     ResponseEntity<?> getReport(Integer year, Integer month, String type);
+
+    
+    ResponseEntity<?> getDataLineChart(Integer year, Integer month);
+
 }
