@@ -23,9 +23,17 @@ public class ReportController {
     public ResponseEntity<?> getReport(
         @RequestParam(required = true) Integer year,
         @RequestParam(required = false) Integer month,
-        @RequestParam(required = true) String type
+        @RequestParam(required = false) String type
     ) {
         return reportService.getReport(year, month, type);
+    }
+
+    @GetMapping("/line-chart")
+    public ResponseEntity<?> getDataLineChart(
+        @RequestParam(required = true) Integer year,
+        @RequestParam(required = false) Integer month
+    ) {
+        return reportService.getDataLineChart(year, month);
     }
     
 }

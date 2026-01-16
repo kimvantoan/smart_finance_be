@@ -1,6 +1,8 @@
 package com.smart_finance.smart_finance_be.service.impl;
 
 import java.math.BigDecimal;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.smart_finance.smart_finance_be.cmmn.base.Response;
 import com.smart_finance.smart_finance_be.cmmn.utils.SecurityUtils;
+import com.smart_finance.smart_finance_be.entity.CashFlowLineDTO;
+import com.smart_finance.smart_finance_be.entity.CashFlowLineProjection;
 import com.smart_finance.smart_finance_be.entity.CategoryType;
 import com.smart_finance.smart_finance_be.payload.response.ReportResponse;
 import com.smart_finance.smart_finance_be.payload.response.TotalAmountCategory;
@@ -49,6 +53,27 @@ public class ReportServiceImpl implements ReportService {
 
     }
 
+    @Override
+    public ResponseEntity<?> getDataLineChart(Integer year, Integer month) {
+
+        Long userId = SecurityUtils.getCurrentUserId();
+    
+        if (month != null && month != 0) {
+            var raw = transactionRepository.getCashFlowByDay(userId, year, month);
+    
+            return ResponseEntity.ok(
+                fillFullDays(raw, year, month)
+            );
+        }
+    
+        var raw = transactionRepository.getCashFlowByMonth(userId, year);
+    
+        return ResponseEntity.ok(
+            fillFullMonths(raw)
+        );
+    }
+    
+    
     private BigDecimal calculateTotalIncome(List<TransactionProjection> transactions) {
 
         BigDecimal totalAmount = 
@@ -84,4 +109,72 @@ public class ReportServiceImpl implements ReportService {
                 .map(e -> new TotalAmountCategory(e.getValue(), e.getKey()))
                 .toList();
     }
+
+
+    private List<CashFlowLineDTO> fillFullDays(
+        List<CashFlowLineProjection> rawData,
+        int year,
+        int month
+) {
+    Map<Integer, CashFlowLineProjection> map = rawData.stream()
+        .collect(Collectors.toMap(
+            CashFlowLineProjection::getTime,
+            i -> i
+        ));
+
+    int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
+
+    List<CashFlowLineDTO> result = new ArrayList<>();
+
+    for (int day = 1; day <= daysInMonth; day++) {
+        if (map.containsKey(day)) {
+            var d = map.get(day);
+            result.add(new CashFlowLineDTO(
+                day,
+                d.getIncome(),
+                d.getExpense()
+            ));
+        } else {
+            result.add(new CashFlowLineDTO(
+                day,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO
+            ));
+        }
+    }
+
+    return result;
+}
+
+    private List<CashFlowLineDTO> fillFullMonths(
+        List<CashFlowLineProjection> rawData
+    ) {
+    Map<Integer, CashFlowLineProjection> map = rawData.stream()
+        .collect(Collectors.toMap(
+            CashFlowLineProjection::getTime,
+            i -> i
+        ));
+
+    List<CashFlowLineDTO> result = new ArrayList<>();
+
+    for (int m = 1; m <= 12; m++) {
+        if (map.containsKey(m)) {
+            var d = map.get(m);
+            result.add(new CashFlowLineDTO(
+                m,
+                d.getIncome(),
+                d.getExpense()
+            ));
+        } else {
+            result.add(new CashFlowLineDTO(
+                m,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO
+            ));
+        }
+    }
+
+    return result;
+    }
+
 }
