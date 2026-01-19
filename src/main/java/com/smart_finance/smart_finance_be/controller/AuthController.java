@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smart_finance.smart_finance_be.payload.request.ChangePwRequest;
 import com.smart_finance.smart_finance_be.payload.request.LoginRequest;
 import com.smart_finance.smart_finance_be.payload.request.RegisterRequest;
 import com.smart_finance.smart_finance_be.payload.request.ResendOtpRequest;
@@ -15,6 +16,9 @@ import com.smart_finance.smart_finance_be.service.OtpService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @AllArgsConstructor
 @RestController
@@ -43,4 +47,16 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         return authService.login(req);
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser() {
+        return authService.currentUser();
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePwRequest req) {
+        return authService.changePassword(req);
+    }
+    
+    
 }

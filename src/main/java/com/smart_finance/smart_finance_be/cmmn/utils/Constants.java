@@ -28,4 +28,11 @@ public class Constants {
 
     //Transaction
     public static final String TRANSACTION_NOT_FOUND_MES = "Không tìm thấy giao dịch";
+
+    //change-password
+    public static final int OLD_PASSWORD_INVALID_CODE = 412;
+    public static final String OLD_PASSWORD_INVALID_MES = "Mật khẩu cũ không chính xác";
+    public static final int NEW_PASSWORD_CONFIRM_NOT_MATCH_CODE = 413;
+    public static final String NEW_PASSWORD_CONFIRM_NOT_MATCH_MES = "Mật khẩu mới và mật khẩu xác nhận không khớp";
+
 }
