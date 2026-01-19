@@ -2,6 +2,7 @@ package com.smart_finance.smart_finance_be.cmmn.config;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,12 +20,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.smart_finance.smart_finance_be.security.jwt.AuthTokenFilter;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    
+    @Value("${app.cors.allowed-origins}")
+    private String corsOrigins;
+
     private final AuthTokenFilter authenticationJwtTokenFilter;
   
     @Bean
@@ -65,10 +69,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
     
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:5173",
-            "http://192.168.68.184:5173"
-        ));
+        configuration.setAllowedOrigins(Arrays.asList(corsOrigins.split(",")));
     
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
