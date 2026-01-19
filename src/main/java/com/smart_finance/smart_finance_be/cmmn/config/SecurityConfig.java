@@ -21,7 +21,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.smart_finance.smart_finance_be.security.jwt.AuthTokenFilter;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -70,8 +69,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
     
-        configuration.setAllowedOriginPatterns(Arrays.asList(corsOrigins.split(",")));
-    
+        configuration.setAllowedOrigins(List.of(corsOrigins));
+
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization"));
