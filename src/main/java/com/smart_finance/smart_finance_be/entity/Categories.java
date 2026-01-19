@@ -44,4 +44,17 @@ public class Categories extends BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt; 
+
+    public Categories(Long userId,
+        String name,
+        CategoryType type,
+        CategoryStatus status,
+        String iconKey) {
+        this.userId = userId;
+        this.name = name;
+        this.type = type;
+        this.status = status;
+        this.iconKey = iconKey;
+        this.deleted = false;
+    }
 }

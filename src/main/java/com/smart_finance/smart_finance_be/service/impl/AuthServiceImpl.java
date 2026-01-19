@@ -3,6 +3,7 @@ package com.smart_finance.smart_finance_be.service.impl;
 import java.time.ZoneId;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,11 +16,14 @@ import org.springframework.stereotype.Service;
 import com.smart_finance.smart_finance_be.cmmn.base.Response;
 import com.smart_finance.smart_finance_be.cmmn.exception.ErrorMessage;
 import com.smart_finance.smart_finance_be.cmmn.utils.Constants;
+import com.smart_finance.smart_finance_be.cmmn.utils.SecurityUtils;
 import com.smart_finance.smart_finance_be.entity.OtpEntity;
 import com.smart_finance.smart_finance_be.entity.UserStatus;
 import com.smart_finance.smart_finance_be.entity.Users;
+import com.smart_finance.smart_finance_be.payload.request.ChangePwRequest;
 import com.smart_finance.smart_finance_be.payload.request.LoginRequest;
 import com.smart_finance.smart_finance_be.payload.request.RegisterRequest;
+import com.smart_finance.smart_finance_be.payload.response.UserResponse;
 import com.smart_finance.smart_finance_be.repository.OtpRepository;
 import com.smart_finance.smart_finance_be.repository.UserRepository;
 import com.smart_finance.smart_finance_be.security.jwt.JwtUtils;
@@ -41,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final JwtUtils jwtUtils;
     private final OtpRepository otpRepository;
+    private final CategoryServiceImpl categoryService;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional
@@ -56,7 +62,9 @@ public class AuthServiceImpl implements AuthService {
         user.setUsername(req.getUsername());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setStatus(UserStatus.PENDING);
-        userRepository.save(user);
+        Users savedUser = userRepository.save(user);
+
+        categoryService.saveDefaultCategories(savedUser.getId());
 
         String otp = otpService.generateOtp();
 
@@ -77,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
         
     }
 
-      public ResponseEntity<?> login(LoginRequest req) {
+    public ResponseEntity<?> login(LoginRequest req) {
         Optional<Users> optUser = userRepository.findByEmail(req.getEmail());
 
         // User not found
@@ -107,6 +115,39 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtils.generateToken(userDetails.getUsername());
 
         return ResponseEntity.ok().body(new Response().setData(token).setMessage("Login success"));
+    }
+    
+    @Override
+    public ResponseEntity<?> currentUser() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Users user = userRepository.findById(userId).orElseThrow(
+            () -> new RuntimeException("User not found")
+        );
+        UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+
+        return ResponseEntity.ok().body(new Response().setData(userResponse).setMessage("Get current user success"));
+    }
+
+    @Override
+    public ResponseEntity<?> changePassword(ChangePwRequest req) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Users user = userRepository.findById(userId).orElseThrow(
+            () -> new RuntimeException("User not found")
+        );
+
+        // Old password is incorrect
+        if(!passwordEncoder.matches(req.getOldPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body(new ErrorMessage(Constants.OLD_PASSWORD_INVALID_CODE, Constants.OLD_PASSWORD_INVALID_MES));
+        }
+
+        // New password and confirm new password do not match
+        if(!req.getNewPassword().equals(req.getConfirmNewPassword())) {
+            return ResponseEntity.badRequest().body(new ErrorMessage(Constants.NEW_PASSWORD_CONFIRM_NOT_MATCH_CODE, Constants.NEW_PASSWORD_CONFIRM_NOT_MATCH_MES));
+        }
+        user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok().body(new Response().setMessage("Change password success"));
+        
     }
 }
                                     

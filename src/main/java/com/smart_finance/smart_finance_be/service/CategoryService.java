@@ -14,4 +14,6 @@ public interface CategoryService {
     ResponseEntity<?> updateCategory(Long id, CategoryRequest req);
 
     ResponseEntity<?> deleteCategory(Long id);
+
+    ResponseEntity<?> saveDefaultCategories(Long userId);
 }
